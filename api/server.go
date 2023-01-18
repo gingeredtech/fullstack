@@ -1,62 +1,31 @@
-package seed
+package api
 
 import (
+	"fmt"
 	"log"
+	"os"
 
-	"github.com/gingeredtech/fullstack/api/models"
-	"github.com/jinzhu/gorm"
+	"github.com/gingeredtech/fullstack/api/controllers"
+	"github.com/gingeredtech/fullstack/api/seed"
+	"github.com/joho/godotenv"
 )
 
-var users = []models.User{
-	models.User{
-		Nickname: "Dr C",
-		Email:    "iain@gi.com",
-		Password: "password",
-	},
-	models.User{
-		Nickname: "Martin Luther",
-		Email:    "luther@gmail.com",
-		Password: "password",
-	},
-}
+var server = controllers.Server{}
 
-var posts = []models.Post{
-	models.Post{
-		Title:   "Title 1",
-		Content: "Hello world 1",
-	},
-	models.Post{
-		Title:   "Title 2",
-		Content: "Hello world 2",
-	},
-}
+func Run() {
 
-func Load(db *gorm.DB) {
-
-	err := db.Debug().DropTableIfExists(&models.Post{}, &models.User{}).Error
+	var err error
+	err = godotenv.Load()
 	if err != nil {
-		log.Fatalf("cannot drop table: %v", err)
-	}
-	err = db.Debug().AutoMigrate(&models.User{}, &models.Post{}).Error
-	if err != nil {
-		log.Fatalf("cannot migrate table: %v", err)
+		log.Fatalf("Error getting env, not comming through %v", err)
+	} else {
+		fmt.Println("We are getting the env values")
 	}
 
-	err = db.Debug().Model(&models.Post{}).AddForeignKey("author_id", "users(id)", "cascade", "cascade").Error
-	if err != nil {
-		log.Fatalf("attaching foreign key error: %v", err)
-	}
+	server.Initialize(os.Getenv("DB_DRIVER"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_PORT"), os.Getenv("DB_HOST"), os.Getenv("DB_NAME"))
 
-	for i, _ := range users {
-		err = db.Debug().Model(&models.User{}).Create(&users[i]).Error
-		if err != nil {
-			log.Fatalf("cannot seed users table: %v", err)
-		}
-		posts[i].AuthorID = users[i].ID
+	seed.Load(server.DB)
 
-		err = db.Debug().Model(&models.Post{}).Create(&posts[i]).Error
-		if err != nil {
-			log.Fatalf("cannot seed posts table: %v", err)
-		}
-	}
+	server.Run(":8080")
+
 }

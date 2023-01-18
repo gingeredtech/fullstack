@@ -5,10 +5,10 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gingeredtech/fullstack/api/models"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
-
-	"github.com/gingeredtech/fullstack/api/models"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 type Server struct {

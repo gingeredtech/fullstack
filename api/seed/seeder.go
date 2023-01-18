@@ -2,18 +2,22 @@ package seed
 
 import (
 	"log"
+	"time"
 
 	"github.com/gingeredtech/fullstack/api/models"
 	"github.com/jinzhu/gorm"
 )
 
 var users = []models.User{
-	models.User{
-		Nickname: "Steven victor",
-		Email:    "steven@gmail.com",
-		Password: "password",
+	{
+		ID:        0,
+		Nickname:  "Steven victor",
+		Email:     "steven@gmail.com",
+		Password:  "password",
+		CreatedAt: time.Time{},
+		UpdatedAt: time.Time{},
 	},
-	models.User{
+	{
 		Nickname: "Martin Luther",
 		Email:    "luther@gmail.com",
 		Password: "password",
@@ -21,11 +25,11 @@ var users = []models.User{
 }
 
 var posts = []models.Post{
-	models.Post{
+	{
 		Title:   "Title 1",
 		Content: "Hello world 1",
 	},
-	models.Post{
+	{
 		Title:   "Title 2",
 		Content: "Hello world 2",
 	},
@@ -47,7 +51,7 @@ func Load(db *gorm.DB) {
 		log.Fatalf("attaching foreign key error: %v", err)
 	}
 
-	for i, _ := range users {
+	for i := range users {
 		err = db.Debug().Model(&models.User{}).Create(&users[i]).Error
 		if err != nil {
 			log.Fatalf("cannot seed users table: %v", err)
