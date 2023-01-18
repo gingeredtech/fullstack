@@ -100,7 +100,7 @@ func seedUsers() error {
 		},
 	}
 
-	for i, _ := range users {
+	for i := range users {
 		err := server.DB.Model(&models.User{}).Create(&users[i]).Error
 		if err != nil {
 			return err
